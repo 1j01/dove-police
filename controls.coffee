@@ -51,7 +51,6 @@ class @KeyboardMouseControls extends Controls
 class @GamepadControls extends Controls
 	constructor: (@gamepad)->
 		super()
-		console.log @gamepad
 	
 	update: ->
 		precision = 0.09

@@ -103,6 +103,7 @@ class @Human extends @Animal
 			
 			@vx += @controls.move_x * 2
 			@vy += @controls.move_y * 2
+		
 		@x += @vx
 		@y += @vy
 		@vx *= 0.7
@@ -117,5 +118,11 @@ class @Shopster extends @NPC
 class @Playster extends @Human
 	constructor: ({@controls, @view})->
 		super({@controls})
+
+class @Item extends @PhysicalEntity
+	# in case there are collectable porcelain lions later in the game
+
+class @Weapon extends @Item
+	# lays da heat
 
 module?.exports = {@Entity, @Animal, @Human, @NPC, @Shopster, @Playster}

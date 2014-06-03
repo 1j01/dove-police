@@ -161,7 +161,7 @@ do animate = ->
 			~~(p.y / TILE_SIZE / AREA_SIZE)
 		)
 		socket.emit 'update', {EID: p.EID, x: p.x, y: p.y, vx: p.vx, vy: p.vy, rotation: p.rotation}
-		if p.controls.shoot and Math.random() < 0.4
+		if p.controls.shoot
 			console.log 'shoot', from: {x: p.x, y: p.y, rotation: p.rotation}
 			socket.emit 'shoot', from: {x: p.x, y: p.y, rotation: p.rotation}
 	
