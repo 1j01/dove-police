@@ -57,6 +57,7 @@ do window.onresize = ->
 	canvas.width = document.body.clientWidth
 	canvas.height = document.body.clientHeight
 
+window.oncontextmenu = -> no
 
 socket.on 'entities', (_entities)->
 	for _eid, _e of _entities
@@ -69,6 +70,11 @@ socket.on 'entities', (_entities)->
 		if not my_entities[_eid]
 			for key, val of _e
 				entities[_eid][key] = val
+	
+	for eid, e of entities
+		if not _entities[eid]
+			entities[eid].destroy?()
+			delete entities[eid]
 
 
 join = (controls)->
@@ -141,7 +147,7 @@ do animate = ->
 	
 	new_gamepads = navigator.getGamepads?() or navigator.webkitGetGamepads?() or navigator.webkitGamepads or something?
 	if new_gamepads
-		for gamepad in new_gamepads when gamepad?
+		for gamepad in new_gamepads when gamepad? and gamepad.buttons.length
 			
 			gamepad_is_new = yes
 			for old_gamepad in good_old_gamepads
