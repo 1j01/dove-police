@@ -8,6 +8,9 @@ entities = {
 playsters = {
 	# [PID]: Playster
 }
+my_entities = {
+	# [EID]: Entity (Playster)
+}
 
 class Area
 	constructor: (@wx, @wy)->
@@ -58,9 +61,14 @@ do window.onresize = ->
 socket.on 'entities', (_entities)->
 	for _eid, _e of _entities
 		if not entities[_eid]
-			entities[_eid] = new Entitiy(_eid)
-		for key, val of _e
-			entities[_eid][key] = val
+			console.log 'entity', _entities[_eid]
+			#entities[_eid] = new Entitiy(_eid)
+			entities[_eid] = new Playster({})
+			entities[_eid].eid = _eid
+		
+		if not my_entities[_eid]
+			for key, val of _e
+				entities[_eid][key] = val
 
 
 join = (controls)->
@@ -78,6 +86,7 @@ join = (controls)->
 			p.PID = PID
 			entities[EID] = p
 			playsters[PID] = p
+			my_entities[EID] = p
 			controls.playster = p
 			console.log 'spawned', p
 
@@ -115,7 +124,7 @@ do animate = ->
 			~~(p.x * AREA_SIZE)
 			~~(p.y * AREA_SIZE)
 		)
-		socket.emit "playster", {EID: p.EID, x: p.x, y: p.y, vx: p.vx, vy: p.vy, rotation: p.rotation}
+		socket.emit 'update', {EID: p.EID, x: p.x, y: p.y, vx: p.vx, vy: p.vy, rotation: p.rotation}
 	
 	for _loc, area of areas
 		area.draw(view)

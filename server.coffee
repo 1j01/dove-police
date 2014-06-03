@@ -27,9 +27,15 @@ for wx in [-5..5]
 		areas[at wx, wy] = generate_area(wx, wy)
 
 io.on 'connection', (socket)->
+	
 	my_entities = {
-		# [EID]: Entity
+		# [EID]: Entity (Playster)
 	}
+	
+	socket.on 'disconnect', ->
+		for _eid of my_entities
+			console.log 'removing', _eid, entities[_eid]
+			delete entities[_eid]
 	
 	socket.on 'request area', ([wx, wy])->
 		areas[at wx, wy] ?= generate_area(wx, wy)
@@ -49,15 +55,15 @@ io.on 'connection', (socket)->
 			y: playster.y
 			PID: PID # Player ID: This is so the client can keep track of which player is spawning.
 			EID: EID
-	###
-	socket.on 'playster', (o)->
+	
+	socket.on 'update', (o)->
 		if my_entities[o.EID]
 			for key, val of o
 				entities[o.EID][key] = val
 		else
-			socket.emit 'error', 'WHAT PLAYER? HUH PUNK?'
-	###
+			socket.emit 'error', 'Try hacking in *any other way*'
+
 
 setInterval ->
-	io.emit 'entities', entities
+	io.sockets.volatile.emit 'entities', entities
 , 5
