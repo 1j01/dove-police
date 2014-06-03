@@ -29,6 +29,12 @@ class @KeyboardMouseControls extends Controls
 				@mouse_y_in_view = e.clientY
 			else
 				console.log 'KeyboardMouseControls waiting for playster'
+		
+		window.addEventListener 'mousedown', (e)=>
+			@shoot = yes
+		
+		window.addEventListener 'mouseup', (e)=>
+			@shoot = no
 	
 	update: ->
 		right = @keys[39]? or @keys[68]?
@@ -71,6 +77,7 @@ class @GamepadControls extends Controls
 			@look_x = axes[3]
 			@look_y = axes[4]
 		
+		@shoot = @gamepad.buttons[0].pressed
 		
 		if Math.abs(@move_x) < precision and Math.abs(@move_y) < precision
 			@move_x = 0

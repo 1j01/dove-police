@@ -11,12 +11,37 @@ playsters = {
 my_entities = {
 	# [EID]: Entity (Playster)
 }
+effects = []
+
+
+class Effect
+	constructor: ->
+		@life = @starting_life = 20
+		effects.push @
+	
+	update: ->
+		if @life-- <= 0
+			effects.splice(effects.indexOf(@), 1)
+
+class GunShotEffect extends Effect
+	constructor: ({@from, @to})->
+		super()
+		@life = @starting_life = 3
+	
+	draw: (view)->
+		ctx.lineWidth = 1.4
+		ctx.strokeStyle = "rgba(255, 255, 255, #{@life / @starting_life})"
+		ctx.beginPath()
+		ctx.moveTo(@from.x, @from.y)
+		ctx.lineTo(@to.x, @to.y)
+		ctx.stroke()
+
 
 class Area
 	constructor: (@wx, @wy)->
 		@tiles =
-			for x in [0..AREA_SIZE]
-				for y in [0..AREA_SIZE]
+			for x in [0...AREA_SIZE]
+				for y in [0...AREA_SIZE]
 					'#006'
 	load: (@tiles)->
 	draw: (view)->
@@ -24,7 +49,7 @@ class Area
 		X = @wx * W
 		Y = @wy * H
 		
-		#/2 is 4 t3st1ng
+		#/2 is 4  t 3 st 1 ng ... 0
 		if X + W/2 > view.left and Y + H/2 > view.top and X - W/2 < view.right and Y - H/2 < view.bottom
 			# todo: only draw intersection with view
 			ctx.save()
@@ -76,6 +101,9 @@ socket.on 'entities', (_entities)->
 			entities[eid].destroy?()
 			delete entities[eid]
 
+socket.on 'shot', ({from, to})->
+	new GunShotEffect({from, to})
+
 
 join = (controls)->
 	joining_PID = 'PID'+(Math.random()*567567)
@@ -86,14 +114,17 @@ join = (controls)->
 	socket.on 'spawn', ({PID, EID, x, y})->
 		if PID is joining_PID
 			p = new Playster({controls})
+			
 			p.x = x or 160
 			p.y = y or 160
 			p.EID = EID
 			p.PID = PID
+			
 			entities[EID] = p
 			playsters[PID] = p
 			my_entities[EID] = p
 			controls.playster = p
+			
 			console.log 'spawned', p
 
 join new KeyboardMouseControls()
@@ -107,7 +138,6 @@ window.addEventListener 'gamepaddisconnected', (e)->
 ###
 
 good_old_gamepads = []
-
 
 do animate = ->
 	requestAnimationFrame animate
@@ -127,10 +157,13 @@ do animate = ->
 	for _pid, p of playsters
 		p.controls.update()
 		load_area(
-			~~(p.x * AREA_SIZE)
-			~~(p.y * AREA_SIZE)
+			~~(p.x / TILE_SIZE / AREA_SIZE)
+			~~(p.y / TILE_SIZE / AREA_SIZE)
 		)
 		socket.emit 'update', {EID: p.EID, x: p.x, y: p.y, vx: p.vx, vy: p.vy, rotation: p.rotation}
+		if p.controls.shoot and Math.random() < 0.4
+			console.log 'shoot', from: {x: p.x, y: p.y, rotation: p.rotation}
+			socket.emit 'shoot', from: {x: p.x, y: p.y, rotation: p.rotation}
 	
 	for _loc, area of areas
 		area.draw(view)
@@ -141,9 +174,13 @@ do animate = ->
 	for _eid, e of entities
 		ctx.save()
 		ctx.translate(e.x, e.y)
-		ctx.rotate(e.rotation)
+		ctx.rotate(e.rotation + TAU/4)
 		e.draw(ctx)
 		ctx.restore()
+	
+	for e in effects
+		e.update()
+		e.draw()
 	
 	new_gamepads = navigator.getGamepads?() or navigator.webkitGetGamepads?() or navigator.webkitGamepads or something?
 	if new_gamepads

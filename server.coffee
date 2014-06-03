@@ -12,8 +12,8 @@ areas = {
 EID_COUNTER = 0 # Entity ID
 
 generate_area = (wx, wy)->
-	for x in [0..AREA_SIZE]
-		for y in [0..AREA_SIZE]
+	for x in [0...AREA_SIZE]
+		for y in [0...AREA_SIZE]
 			"hsl(#{
 				Math.random()*36+30
 			}, #{
@@ -63,6 +63,19 @@ io.on 'connection', (socket)->
 		else
 			socket.emit 'error', 'Try hacking in *any other way*'
 
+	socket.on 'shoot', ({from})->
+		
+		# do bullet physics here
+		to =
+			x: from.x + Math.cos(from.rotation) * 1500
+			y: from.y + Math.sin(from.rotation) * 1500
+		
+		# don't shoot from the center of the player
+		from =
+			x: from.x + Math.cos(from.rotation) * 20
+			y: from.y + Math.sin(from.rotation) * 20
+		
+		io.sockets.emit 'shot', {from, to}
 
 setInterval ->
 	io.sockets.volatile.emit 'entities', entities

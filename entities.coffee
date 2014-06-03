@@ -99,7 +99,7 @@ class @Human extends @Animal
 		if @controls
 			@look_x = (@look_x + @controls.look_x) / 2
 			@look_y = (@look_y + @controls.look_y) / 2
-			@rotation = Math.atan2(@look_y, @look_x) + TAU/4
+			@rotation = Math.atan2(@look_y, @look_x)
 			
 			@vx += @controls.move_x * 2
 			@vy += @controls.move_y * 2
