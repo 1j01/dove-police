@@ -16,5 +16,6 @@
 	},
 	"scripts": {
 		"start": "coffee server.coffee"
-	}
+	},
+	"main": "server.coffee"
 }
