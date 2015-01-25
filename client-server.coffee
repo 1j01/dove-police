@@ -22,10 +22,12 @@ if module?
 	server = app.listen(PORT, IP)
 	console.log "Server listening on port :#{PORT}"
 	
-	exp.io = socketio.listen(server, {'log level': 2})
+	io = socketio.listen(server, {'log level': 2})
 	
 	app.use express.static(__dirname)
 	
+	io.on 'connection', (socket)->
+		;
 else
 	window.socket = window.io.connect(location.origin)
 
